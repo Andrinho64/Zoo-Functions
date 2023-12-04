@@ -18,7 +18,7 @@ describe('Testes da função handlerElephants', () => {
 
   it('deve retornar a localização dos elefantes dentro do Zoológico', () => {
     const result = handlerElephants('location');
-    expect(result).toBe('NW'); // Ajuste conforme a implementação real
+    expect(result).toBe('NW');
   });
 
   it('deve retornar a popularidade dos elefantes', () => {
@@ -29,5 +29,15 @@ describe('Testes da função handlerElephants', () => {
   it('deve retornar um array com a relação de dias em que é possível visitar os elefantes', () => {
     const result = handlerElephants('availability');
     expect(result).toEqual(['Friday', 'Saturday', 'Sunday', 'Tuesday']);
+  });
+
+  it('deve retornar undefined se nenhum argumento for passado', () => {
+    const result = handlerElephants();
+    expect(result).toBeUndefined();
+  });
+
+  it('deve retornar mensagem de erro para argumento inválido', () => {
+    const result = handlerElephants(123);
+    expect(result).toBe('Parâmetro inválido, é necessário uma string');
   });
 });
