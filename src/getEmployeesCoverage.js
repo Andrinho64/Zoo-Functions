@@ -1,28 +1,56 @@
-/* const data = require('../data/zoo_data');
+const data = require('../data/zoo_data');
 
-const findEmployee = (prop, value) =>
-  (data.employees.find((emp) => emp[prop].toLowerCase() === value.toLowerCase()) || {}).id;
+const findEmployeeByName = (name) =>
+  data.employees.find(
+    (employee) =>
+      employee.firstName.toLowerCase() === name.toLowerCase()
+      || employee.lastName.toLowerCase() === name.toLowerCase(),
+  );
 
-const getSpecies = (employeeId) => (data.employees.find((emp) => emp.id === employeeId)
- || { responsibleFor: [] }).responsibleFor
-  .map((speciesId) => (data.species.find((sp) => sp.id === speciesId) || {}).name).filter(Boolean);
+const findEmployeeById = (id) => data.employees.find((employee) => employee.id === id);
 
-const getFullName = (employee) => `${employee.firstName} ${employee.lastName}`;
+const getSpeciesAndLocations = (employee) => {
+  if (!employee) return null;
 
-const getEmployeesCoverage = ({ name, id } = {}) => {
-  const employeeId = id || findEmployee('firstName', name) || findEmployee('lastName', name);
+  const species = employee.responsibleFor.map((speciesId) => {
+    const spec = data.species.find((s) => s.id === speciesId);
+    return spec ? spec.name : null;
+  });
 
-  if (!employeeId) return data.employees.map((e) => ({ ...e, fullName: getFullName(e) }));
+  const locations = employee.responsibleFor.map((speciesId) => {
+    const spec = data.species.find((s) => s.id === speciesId);
+    return spec ? spec.location : null;
+  });
 
-  const employee = data.employees.find((e) => e.id === employeeId) || {};
-  if (!employee.id) throw new Error('Informações inválidas');
+  return { species, locations };
+};
 
-  const species = getSpecies(employeeId);
-  const locations = employee.responsibleFor.map((s) =>
-    (data.species.find((sp) => sp.id === s) || {}).location);
+const formatEmployeeInfo = (employee) => {
+  const { species, locations } = getSpeciesAndLocations(employee);
+  return {
+    id: employee.id,
+    fullName: `${employee.firstName} ${employee.lastName}`,
+    species,
+    locations,
+  };
+};
 
-  return { id: employee.id, fullName: getFullName(employee), species, locations };
+const getEmployeesCoverage = (options) => {
+  if (!options) {
+    return data.employees.map(formatEmployeeInfo);
+  }
+
+  let employee = null;
+
+  if (options.name) {
+    employee = findEmployeeByName(options.name);
+  } else if (options.id) {
+    employee = findEmployeeById(options.id);
+  }
+
+  if (employee) return formatEmployeeInfo(employee);
+
+  throw new Error('Informações inválidas');
 };
 
 module.exports = getEmployeesCoverage;
- */
