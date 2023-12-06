@@ -1,64 +1,32 @@
 const data = require('../data/zoo_data');
 
-const getAnimalsAvailableOnDay = (day) =>
-  data.species
-    .filter((species) => species.availability.includes(day))
-    .map((species) => species.name);
-
-const getOfficeHoursOnDay = (day) => {
-  const dayHours = data.hours[day];
-  if (!dayHours) {
-    return 'o zoológico está fechado';
-  }
-  const { open, close } = dayHours;
-  return `Open from ${open}am until ${close}pm`;
-};
-
-const getScheduleForDay = (day) => ({
-  [day]: {
-    officeHour: getOfficeHoursOnDay(day),
-    exhibition: getAnimalsAvailableOnDay(day),
-  },
-});
-
-const createCompleteSchedule = () => {
-  const schedule = {};
-  Object.keys(data.hours).forEach((day) => {
-    schedule[day] = {
-      officeHour: getOfficeHoursOnDay(day),
-      exhibition: getAnimalsAvailableOnDay(day),
+const daysAndHours = () => {
+  const days = Object.keys(data.hours);
+  const daysOfWeek = {};
+  days.forEach((day) => {
+    daysOfWeek[day] = {
+      officeHour: day === 'Monday' ? 'CLOSED'
+        : `Open from ${data.hours[day].open}am until ${data.hours[day].close}pm`,
+      exhibition: day === 'Monday' ? 'The zoo will be closed!'
+        : data.species.filter((specie) => specie.availability.includes(day))
+          .map((specie) => specie.name),
     };
   });
-  return schedule;
+  return daysOfWeek;
 };
-
-const getAnimalSchedule = (animal) => {
-  const animalData = data.species.find((species) => species.name === animal);
-  const availableDays = animalData ? animalData.availability : [];
-  return availableDays;
-};
-
-const getDaySchedule = (day) => ({
-  [day]: {
-    officeHour: getOfficeHoursOnDay(day),
-    exhibition: [],
-  },
-});
 
 const getSchedule = (scheduleTarget) => {
-  if (!scheduleTarget) {
-    return createCompleteSchedule();
+  const daysOfWeek = daysAndHours();
+  const animalsHours = data.species.find(({ name }) => (name === scheduleTarget));
+  if (daysOfWeek[scheduleTarget]) {
+    return { [scheduleTarget]: daysOfWeek[scheduleTarget] };
   }
-
-  if (data.hours[scheduleTarget]) {
-    return getScheduleForDay(scheduleTarget);
+  if (!scheduleTarget || animalsHours === undefined) {
+    return daysOfWeek;
   }
-
-  if (data.species.some((species) => species.name === scheduleTarget)) {
-    return getAnimalSchedule(scheduleTarget);
-  }
-
-  return getDaySchedule(scheduleTarget);
+  return animalsHours.availability;
 };
+
+console.log(getSchedule('Sunday'));
 
 module.exports = getSchedule;
