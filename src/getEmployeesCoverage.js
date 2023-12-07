@@ -1,6 +1,27 @@
 const data = require('../data/zoo_data');
 
-const findEmployeeByName = (name) =>
+const createEmployee = (employee) => ({
+  id: employee.id,
+  fullName: `${employee.firstName} ${employee.lastName}`,
+  species: data.species.filter((specie) => employee.responsibleFor.includes(specie.id))
+    .map((specie) => specie.name),
+  locations: data.species.filter((specie) => employee.responsibleFor.includes(specie.id))
+    .map((specie) => specie.location),
+});
+const getEmployeesCoverage = (callEmployee) => {
+  if (!callEmployee) {
+    return data.employees.map((employee) => createEmployee(employee));
+  }
+  const findEmployee = data.employees.find((employee) => employee.firstName === callEmployee.name
+  || employee.lastName === callEmployee.name || callEmployee.id === employee.id);
+  if (findEmployee === undefined) throw new Error('Informações inválidas');
+
+  return createEmployee(findEmployee);
+};
+/* console.log(getEmployeesCoverage({id: 'Xablau'})); */
+module.exports = getEmployeesCoverage;
+
+/* const findEmployeeByName = (name) =>
   data.employees.find(
     (employee) =>
       employee.firstName.toLowerCase() === name.toLowerCase()
@@ -54,3 +75,4 @@ const getEmployeesCoverage = (options) => {
 };
 
 module.exports = getEmployeesCoverage;
+ */
