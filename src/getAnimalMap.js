@@ -13,7 +13,7 @@ const processSpecies = (acc, species, includeNames, sorted, sex) => {
     acc[location] = [];
   }
 
-  if (includeNames) {
+  if (includeNames) { // Se existir, faz a linha 17  se não, faz a 19
     acc[location].push({ [name]: mapResidents(residents, sex, sorted) });
   } else {
     acc[location].push(name);
@@ -23,7 +23,7 @@ const processSpecies = (acc, species, includeNames, sorted, sex) => {
 };
 
 const getAnimalMap = (options = {}) => {
-  const { includeNames, sorted, sex } = options;
+  const { includeNames, sorted, sex } = options; // desestruturação
 
   return data.species.reduce((acc, species) =>
     processSpecies(acc, species, includeNames, sorted, sex), {});
